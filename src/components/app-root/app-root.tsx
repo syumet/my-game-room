@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
 import Peer from 'peerjs';
 import { Message } from '../../utils/message';
 
@@ -9,8 +9,9 @@ import { Message } from '../../utils/message';
 export class AppRoot {
   peer: Peer;
 
-  peerId: string;
-  hostId: string;
+  @State() peerId: string;
+  @State() hostId: string;
+  @State() currentGame: string;
   connections: Peer.DataConnection[] = [];
 
   render() {
@@ -21,8 +22,12 @@ export class AppRoot {
             url="/"
             component="app-home"
             componentProps={{
+              peerId: this.peerId,
+              hostId: this.hostId,
+              currentGame: this.currentGame,
               createPeerCallback: this.createPeer,
-              connectToPeerCallback: this.connectToPeer
+              connectToPeerCallback: this.connectToPeer,
+              updateCurrentGame: this.updateCurrentGame
             }}
           />
         </ion-router>
@@ -39,6 +44,15 @@ export class AppRoot {
         secure: true,
         key: 'peerjs',
         path: '/'
+      }
+    );
+    this.peer.on(
+      'open',
+      id => {
+        this.peerId = id;
+        if (peerId) {
+          this.hostId = id;
+        }
       }
     );
     this.peer.on(
@@ -60,26 +74,7 @@ export class AppRoot {
           'data',
           data => {
             const message = JSON.parse(data) as Message;
-            switch (message.type) {
-              case 'greeting':
-                const messageOut: Message = {
-                  type: "chat",
-                  player: this.peer.id,
-                  content: 'hi!'
-                };
-                console.log(messageOut.player + ': ' + message.content);
-                for (const connection of this.connections) {
-                  if (connection.open) {
-                    connection.send(JSON.stringify(messageOut));
-                  } else {
-                    connection.on('open', () => connection.send(JSON.stringify(messageOut)));
-                  }
-                }
-                break;
-              case 'chat':
-                console.log(message.player + ': ' + message.content);
-                break;
-            }
+            this.handleMessage(message, connection);
           }
         );
       }
@@ -90,8 +85,9 @@ export class AppRoot {
     this.hostId = peerId;
     if (!this.peer) {
       this.createPeer();
-      this.peer.on('open', () => {
+      this.peer.on('open', id => {
         const connection = this.peer.connect(peerId);
+        this.peerId = id;
         connection.on(
           'open',
           () => {
@@ -104,6 +100,68 @@ export class AppRoot {
           }
         )
       })
+    }
+  }
+
+  updateCurrentGame = (game: string) => {
+    this.currentGame = game;
+
+    const setGameMessage: Message = {
+      type: 'set-game',
+      content: this.currentGame
+    };
+    for (const connection of this.connections) {
+      if (connection.open) {
+        connection.send(JSON.stringify(setGameMessage));
+      } else {
+        connection.on('open', () => connection.send(JSON.stringify(setGameMessage)));
+      }
+    }
+  }
+
+  handleMessage(message: Message, connection: Peer.DataConnection) {
+    switch (message.type) {
+      case 'greeting':
+        const messageOut: Message = {
+          type: "chat",
+          player: connection.peer,
+          content: 'hi!'
+        };
+        console.log(messageOut.player + ': ' + message.content);
+        for (const connection of this.connections) {
+          if (connection.open) {
+            connection.send(JSON.stringify(messageOut));
+            if (this.currentGame && connection.peer === messageOut.player) {
+              const setGameMessage: Message = {
+                type: 'set-game',
+                content: this.currentGame
+              };
+              connection.send(JSON.stringify(setGameMessage));
+            }
+          } else {
+            connection.on(
+              'open',
+              () => {
+                connection.send(JSON.stringify(messageOut));
+                if (this.currentGame && connection.peer === messageOut.player) {
+                  const setGameMessage: Message = {
+                    type: 'set-game',
+                    content: this.currentGame
+                  };
+                  connection.send(JSON.stringify(setGameMessage));
+                }
+              }
+            );
+          }
+        }
+        break;
+      case 'chat':
+        console.log(message.player + ': ' + message.content);
+        break;
+      case 'set-game':
+        this.currentGame = message.content;
+        console.log('Game set as ' + message.content);
+        break;
     }
   }
 }

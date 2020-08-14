@@ -1,5 +1,5 @@
 export interface Message {
-    type: 'greeting' | 'chat',
+    type: 'greeting' | 'chat' | 'set-game',
     player?: string,
     content?: string
 }

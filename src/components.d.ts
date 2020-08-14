@@ -9,6 +9,10 @@ export namespace Components {
     interface AppHome {
         "connectToPeerCallback": (peerId: string) => void;
         "createPeerCallback": (peerId: string) => void;
+        "currentGame": string;
+        "hostId": string;
+        "peerId": string;
+        "updateCurrentGame": (game: string) => void;
     }
     interface AppRoot {
     }
@@ -35,6 +39,10 @@ declare namespace LocalJSX {
     interface AppHome {
         "connectToPeerCallback"?: (peerId: string) => void;
         "createPeerCallback"?: (peerId: string) => void;
+        "currentGame"?: string;
+        "hostId"?: string;
+        "peerId"?: string;
+        "updateCurrentGame"?: (game: string) => void;
     }
     interface AppRoot {
     }
