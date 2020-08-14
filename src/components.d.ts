@@ -7,6 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface AppHome {
+        "connectToPeerCallback": (peerId: string) => void;
+        "createPeerCallback": (peerId: string) => void;
     }
     interface AppRoot {
     }
@@ -31,6 +33,8 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppHome {
+        "connectToPeerCallback"?: (peerId: string) => void;
+        "createPeerCallback"?: (peerId: string) => void;
     }
     interface AppRoot {
     }

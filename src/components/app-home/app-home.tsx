@@ -1,4 +1,4 @@
-import { Component, h, Host } from '@stencil/core';
+import { Component, h, Host, Prop } from '@stencil/core';
 
 @Component({
   tag: 'app-home',
@@ -6,6 +6,9 @@ import { Component, h, Host } from '@stencil/core';
   scoped: true
 })
 export class AppHome {
+  @Prop() createPeerCallback: (peerId: string) => void;
+  @Prop() connectToPeerCallback: (peerId: string) => void;
+
   render() {
     return (
       <Host>
@@ -16,8 +19,8 @@ export class AppHome {
         </ion-header>
 
         <ion-content class="ion-padding">
-          <ion-button>Create A Room</ion-button>
-          <ion-button>Join A Room</ion-button>
+          <ion-button onClick={() => this.createPeerCallback(prompt('Enter the room name'))}>Create A Room</ion-button>
+          <ion-button onClick={() => this.connectToPeerCallback(prompt('Enter the room name'))}>Join A Room</ion-button>
         </ion-content>
       </Host>
     );
