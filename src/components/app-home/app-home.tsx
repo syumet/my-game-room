@@ -33,12 +33,19 @@ export class AppHome {
           </ion-content>
         }
         {
-          this.peerId && this.peerId === this.hostId && !this.currentGame &&
-          <ion-content class="ion-padding">
-            <ion-list>
-              <ion-item button onClick={() => this.updateCurrentGame('tic-tac-toe')}>Tic Tac Toe</ion-item>
-            </ion-list>
-          </ion-content>
+          this.peerId && !this.currentGame &&
+          (
+            this.peerId === this.hostId ?
+              <ion-content class="ion-padding">
+                <ion-list>
+                  <ion-item button onClick={() => this.updateCurrentGame('tic-tac-toe')}>Tic Tac Toe</ion-item>
+                </ion-list>
+              </ion-content> :
+              <ion-content class="ion-padding">
+                <ion-text>Waiting for host to start a game...</ion-text>
+              </ion-content>
+          )
+
         }
         {
           this.peerId && this.currentGame === 'tic-tac-toe' &&
