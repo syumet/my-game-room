@@ -11,7 +11,7 @@ export class AppGameTicTacToe {
   static game: TicTacToeGame;
 
   @Prop() isHost: boolean;
-  @Prop() gameUpdate: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
+  @Prop({mutable: true}) gameUpdate: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
   @Prop() notifyMoveCallback: (coordinate: [number, number]) => void;
   @Prop() broadcastGameUpdateCallback: (gameUpdate: any) => void;
 
@@ -37,6 +37,7 @@ export class AppGameTicTacToe {
     } else if (this.isHost && this.gameUpdate?.type === 'move') {
       const update = this.gameUpdate.update as [number, number];
       AppGameTicTacToe.game.play(update);
+      this.gameUpdate = undefined;
     }
 
     return (
