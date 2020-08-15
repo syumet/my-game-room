@@ -11,7 +11,7 @@ export class AppGameTicTacToe {
   static game: TicTacToeGame;
 
   @Prop() isHost: boolean;
-  @Prop({mutable: true}) gameUpdate: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
+  @Prop({ mutable: true }) gameUpdate: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
   @Prop() notifyMoveCallback: (coordinate: [number, number]) => void;
   @Prop() broadcastGameUpdateCallback: (gameUpdate: any) => void;
 
@@ -103,10 +103,13 @@ export class AppGameTicTacToe {
             }
           </g>
         </svg>
-        <ion-button onClick={() => {
-          this.isPlaying = true;
-          AppGameTicTacToe.game = new TicTacToeGame(this.gameUpdateHandler);
-        }}>Start/Restart</ion-button>
+        {
+          this.isHost &&
+          <ion-button onClick={() => {
+            this.isPlaying = true;
+            AppGameTicTacToe.game = new TicTacToeGame(this.gameUpdateHandler);
+          }}>Start/Restart</ion-button>
+        }
         <ion-text>{this.isPlaying ? `${this.currentPlayer}'s turn.` : 'Please start a game.'}</ion-text>
       </Host>
     );
