@@ -19,13 +19,10 @@ export class AppGameTicTacToe {
   @State() board: string[] = ['', '', '', '', '', '', '', '', ''];
   @State() currentPlayer: string;
 
-  render() {
+  componentWillRender() {
     if (AppGameTicTacToe.game) {
       AppGameTicTacToe.game.updateHandler = this.gameUpdateHandler;
     }
-
-    const height = 600;
-    const width = 600;
 
     if (!this.isHost && this.gameUpdate?.type === 'update') {
       const update = this.gameUpdate.update as { gameBoard: string[][], nextPlayer: string, winner?: string };
@@ -39,6 +36,12 @@ export class AppGameTicTacToe {
       AppGameTicTacToe.game.play(update);
       this.gameUpdate = undefined;
     }
+
+  }
+
+  render() {
+    const height = 600;
+    const width = 600;
 
     return (
       <Host>
