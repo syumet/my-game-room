@@ -40,12 +40,17 @@ export class AppGameTicTacToe {
   }
 
   render() {
-    const height = 600;
-    const width = 600;
+    const height = 100;
+    const width = 100;
 
     return (
       <Host>
-        <svg height={height} width={width}>
+        <svg
+          height="calc(100% - 50px)"
+          width="100%"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
           <g id="guidelines">
             <line
               class="guideline"
@@ -54,7 +59,7 @@ export class AppGameTicTacToe {
               x2={width / 3}
               y2={height}
               stroke="black"
-              stroke-width={5}
+              stroke-width={height / 100}
             ></line>
             <line
               class="guideline"
@@ -63,7 +68,7 @@ export class AppGameTicTacToe {
               x2={width / 3 * 2}
               y2={height}
               stroke="black"
-              stroke-width={5}
+              stroke-width={width / 100}
             ></line>
             <line
               class="guideline"
@@ -72,7 +77,7 @@ export class AppGameTicTacToe {
               x2={width}
               y2={height / 3}
               stroke="black"
-              stroke-width={5}
+              stroke-width={height / 100}
             ></line>
             <line
               class="guideline"
@@ -81,7 +86,7 @@ export class AppGameTicTacToe {
               x2={width}
               y2={height / 3 * 2}
               stroke="black"
-              stroke-width={5}
+              stroke-width={width / 100}
             ></line>
           </g>
           <g id="circles">
