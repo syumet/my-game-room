@@ -6,6 +6,8 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface AppGameTicTacToe {
+    }
     interface AppHome {
         "connectToPeerCallback": (peerId: string) => void;
         "createPeerCallback": (peerId: string) => void;
@@ -18,6 +20,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLAppGameTicTacToeElement extends Components.AppGameTicTacToe, HTMLStencilElement {
+    }
+    var HTMLAppGameTicTacToeElement: {
+        prototype: HTMLAppGameTicTacToeElement;
+        new (): HTMLAppGameTicTacToeElement;
+    };
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
     }
     var HTMLAppHomeElement: {
@@ -31,11 +39,14 @@ declare global {
         new (): HTMLAppRootElement;
     };
     interface HTMLElementTagNameMap {
+        "app-game-tic-tac-toe": HTMLAppGameTicTacToeElement;
         "app-home": HTMLAppHomeElement;
         "app-root": HTMLAppRootElement;
     }
 }
 declare namespace LocalJSX {
+    interface AppGameTicTacToe {
+    }
     interface AppHome {
         "connectToPeerCallback"?: (peerId: string) => void;
         "createPeerCallback"?: (peerId: string) => void;
@@ -47,6 +58,7 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface IntrinsicElements {
+        "app-game-tic-tac-toe": AppGameTicTacToe;
         "app-home": AppHome;
         "app-root": AppRoot;
     }
@@ -55,6 +67,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "app-game-tic-tac-toe": LocalJSX.AppGameTicTacToe & JSXBase.HTMLAttributes<HTMLAppGameTicTacToeElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
         }

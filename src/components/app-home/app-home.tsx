@@ -40,7 +40,7 @@ export class AppHome {
         {
           this.peerId && this.currentGame &&
           <ion-content class="ion-padding">
-            <ion-text>{this.currentGame}</ion-text>
+            <app-game-tic-tac-toe></app-game-tic-tac-toe>
           </ion-content>
         }
       </Host>
