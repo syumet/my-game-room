@@ -1,4 +1,4 @@
-import { Component, Host, h, State } from "@stencil/core";
+import { Component, Host, h, State, Prop } from "@stencil/core";
 import { TicTacToeGame } from "./tic-tac-toe-game";
 
 @Component({
@@ -76,31 +76,20 @@ export class AppGameTicTacToe {
             }
           </g>
         </svg>
-        {
-          this.isPlaying &&
-          <ion-button onClick={() => {
-            this.isPlaying = true;
-            this.game = new TicTacToeGame(this.gameUpdateHandler);
-          }}>Restart</ion-button>
-        }
-        {
-          !this.isPlaying &&
-          <ion-button onClick={() => {
-            this.isPlaying = true;
-            this.game = new TicTacToeGame(this.gameUpdateHandler);
-          }}>Start</ion-button>
-        }
-        <ion-text>{`${this.currentPlayer}'s turn.`}</ion-text>
+        <ion-button onClick={() => {
+          this.isPlaying = true;
+          this.game = new TicTacToeGame(this.gameUpdateHandler);
+        }}>Start/Restart</ion-button>
+        <ion-text>{this.isPlaying ? `${this.currentPlayer}'s turn.` : 'Please start a game.'}</ion-text>
       </Host>
     );
   }
 
-  gameUpdateHandler = (gameBoard: string[][], nextPlayer: string, isGameFinished?: boolean) => {
+  gameUpdateHandler = (gameBoard: string[][], nextPlayer: string, winner?: string) => {
     this.board = gameBoard.flatMap(cell => cell);
-    if (isGameFinished) {
-      const playerWin = this.currentPlayer;
+    if (winner) {
       setTimeout(() => {
-        alert(`${playerWin} wins!`);
+        alert(`${winner} wins!`);
       }, 0);
       this.isPlaying = false;
       this.currentPlayer = undefined;

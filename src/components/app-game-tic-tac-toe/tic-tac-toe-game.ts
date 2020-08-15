@@ -8,14 +8,14 @@ export class TicTacToeGame {
     private updateHandler: (
         gameBoard: string[][],
         nextPlayer: string,
-        isGameFinished?: boolean,
+        winner?: string,
     ) => void;
 
     constructor(
         updateHandler: (
             gameBoard: string[][],
             nextPlayer: string,
-            isGameFinished?: boolean,
+            winner?: string,
         ) => void,
     ) {
         this.updateHandler = updateHandler;
@@ -26,16 +26,17 @@ export class TicTacToeGame {
         const [x, y] = coordinate;
         if (!this.gameBoard[x][y]) {
             this.gameBoard[x][y] = this.currentPlayer;
+            const winner = this.determineWinner();
             this.currentPlayer = this.currentPlayer == "o" ? "x" : "o";
-            const isGameFinished = this.determineEndGame();
-            this.updateHandler(this.gameBoard, this.currentPlayer, isGameFinished);
+            this.updateHandler(this.gameBoard, this.currentPlayer, winner);
         }
     }
 
-    determineEndGame() {
-        let result = false;
+    determineWinner() {
+        let isGameEnd = false;
+        let winner = '';
         for (let row = 0; row < 3; row++) {
-            result = result ||
+            isGameEnd = isGameEnd ||
                 this.determinePiecesFromSamePlayer(
                     'o',
                     [
@@ -54,7 +55,7 @@ export class TicTacToeGame {
                 );
         }
         for (let column = 0; column < 3; column++) {
-            result = result ||
+            isGameEnd = isGameEnd ||
                 this.determinePiecesFromSamePlayer(
                     'o',
                     [
@@ -72,7 +73,7 @@ export class TicTacToeGame {
                     ]
                 );
         }
-        result = result ||
+        isGameEnd = isGameEnd ||
             this.determinePiecesFromSamePlayer(
                 'o',
                 [
@@ -89,7 +90,7 @@ export class TicTacToeGame {
                     this.gameBoard[2][2]
                 ]
             );
-        result = result ||
+        isGameEnd = isGameEnd ||
             this.determinePiecesFromSamePlayer(
                 'o',
                 [
@@ -106,7 +107,13 @@ export class TicTacToeGame {
                     this.gameBoard[2][0]
                 ]
             );
-        return result;
+        if (isGameEnd) {
+            winner = this.currentPlayer;
+        }
+        if (this.gameBoard.flatMap(d => d).every(Boolean)) {
+            winner = 'tie';
+        }
+        return winner;
     }
 
     determinePiecesFromSamePlayer(player: string, pieces: string[]) {
