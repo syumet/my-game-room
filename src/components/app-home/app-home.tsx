@@ -1,4 +1,5 @@
 import { Component, h, Host, Prop } from '@stencil/core';
+import { Message } from '../../utils/message';
 
 @Component({
   tag: 'app-home',
@@ -9,9 +10,11 @@ export class AppHome {
   @Prop() peerId: string;
   @Prop() hostId: string;
   @Prop() currentGame: string;
+  @Prop() gameUpdate: { type: 'move' | 'update', update: any };
   @Prop() createPeerCallback: (peerId: string) => void;
   @Prop() connectToPeerCallback: (peerId: string) => void;
   @Prop() updateCurrentGame: (game: string) => void;
+  @Prop() sendMessageCallback: (message: Message) => void;
 
   render() {
     return (
@@ -38,12 +41,33 @@ export class AppHome {
           </ion-content>
         }
         {
-          this.peerId && this.currentGame &&
+          this.peerId && this.currentGame === 'tic-tac-toe' &&
           <ion-content class="ion-padding">
-            <app-game-tic-tac-toe></app-game-tic-tac-toe>
+            <app-game-tic-tac-toe
+              isHost={this.peerId === this.hostId}
+              gameUpdate={this.gameUpdate}
+              notifyMoveCallback={this.notifyMove}
+              broadcastGameUpdateCallback={this.broadcastGameUpdate}
+            ></app-game-tic-tac-toe>
           </ion-content>
         }
       </Host>
     );
+  }
+
+  notifyMove = (move: any) => {
+    this.sendMessageCallback({
+      type: 'game-move',
+      player: this.peerId,
+      content: JSON.stringify(move)
+    });
+  }
+
+  broadcastGameUpdate = (gameUpdate: any) => {
+    this.sendMessageCallback({
+      type: 'game-update',
+      player: this.peerId,
+      content: JSON.stringify(gameUpdate)
+    });
   }
 }

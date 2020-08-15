@@ -8,11 +8,12 @@ import { Message } from '../../utils/message';
 })
 export class AppRoot {
   peer: Peer;
+  connections: Peer.DataConnection[] = [];
 
   @State() peerId: string;
   @State() hostId: string;
   @State() currentGame: string;
-  connections: Peer.DataConnection[] = [];
+  @State() gameUpdate: { type: 'move' | 'update', update: any };
 
   render() {
     return (
@@ -25,9 +26,11 @@ export class AppRoot {
               peerId: this.peerId,
               hostId: this.hostId,
               currentGame: this.currentGame,
+              gameUpdate: this.gameUpdate,
               createPeerCallback: this.createPeer,
               connectToPeerCallback: this.connectToPeer,
-              updateCurrentGame: this.updateCurrentGame
+              updateCurrentGame: this.updateCurrentGame,
+              sendMessageCallback: this.sendMessage
             }}
           />
         </ion-router>
@@ -87,6 +90,7 @@ export class AppRoot {
       this.createPeer();
       this.peer.on('open', id => {
         const connection = this.peer.connect(peerId);
+        this.connections.push(connection);
         this.peerId = id;
         connection.on(
           'open',
@@ -116,6 +120,12 @@ export class AppRoot {
       } else {
         connection.on('open', () => connection.send(JSON.stringify(setGameMessage)));
       }
+    }
+  }
+
+  sendMessage = (message: Message) => {
+    for (const connection of this.connections) {
+      connection.send(JSON.stringify(message));
     }
   }
 
@@ -161,6 +171,20 @@ export class AppRoot {
       case 'set-game':
         this.currentGame = message.content;
         console.log('Game set as ' + message.content);
+        break;
+      case 'game-move':
+        console.log(JSON.stringify(message))
+        this.gameUpdate = {
+          type: 'move',
+          update: JSON.parse(message.content)
+        };
+        break;
+      case 'game-update':
+        console.log(JSON.stringify(message))
+        this.gameUpdate = {
+          type: 'update',
+          update: JSON.parse(message.content)
+        };
         break;
     }
   }

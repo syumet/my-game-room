@@ -5,15 +5,22 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Message } from "./utils/message";
 export namespace Components {
     interface AppGameTicTacToe {
+        "broadcastGameUpdateCallback": (gameUpdate: any) => void;
+        "gameUpdate": { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
+        "isHost": boolean;
+        "notifyMoveCallback": (coordinate: [number, number]) => void;
     }
     interface AppHome {
         "connectToPeerCallback": (peerId: string) => void;
         "createPeerCallback": (peerId: string) => void;
         "currentGame": string;
+        "gameUpdate": { type: 'move' | 'update', update: any };
         "hostId": string;
         "peerId": string;
+        "sendMessageCallback": (message: Message) => void;
         "updateCurrentGame": (game: string) => void;
     }
     interface AppRoot {
@@ -46,13 +53,19 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppGameTicTacToe {
+        "broadcastGameUpdateCallback"?: (gameUpdate: any) => void;
+        "gameUpdate"?: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
+        "isHost"?: boolean;
+        "notifyMoveCallback"?: (coordinate: [number, number]) => void;
     }
     interface AppHome {
         "connectToPeerCallback"?: (peerId: string) => void;
         "createPeerCallback"?: (peerId: string) => void;
         "currentGame"?: string;
+        "gameUpdate"?: { type: 'move' | 'update', update: any };
         "hostId"?: string;
         "peerId"?: string;
+        "sendMessageCallback"?: (message: Message) => void;
         "updateCurrentGame"?: (game: string) => void;
     }
     interface AppRoot {

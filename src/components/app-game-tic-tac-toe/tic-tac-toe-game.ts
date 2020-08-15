@@ -5,7 +5,8 @@ export class TicTacToeGame {
         ["", "", ""],
     ];
     private currentPlayer: string = "o";
-    private updateHandler: (
+    
+    updateHandler: (
         gameBoard: string[][],
         nextPlayer: string,
         winner?: string,

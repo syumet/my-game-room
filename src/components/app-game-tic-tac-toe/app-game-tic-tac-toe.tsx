@@ -7,15 +7,37 @@ import { TicTacToeGame } from "./tic-tac-toe-game";
   scoped: true,
 })
 export class AppGameTicTacToe {
-  game: TicTacToeGame;
+  // TODO should not to use static property
+  static game: TicTacToeGame;
+
+  @Prop() isHost: boolean;
+  @Prop() gameUpdate: { type: 'move' | 'update', update: [number, number] | { gameBoard: string[][], nextPlayer: string, winner?: string } };
+  @Prop() notifyMoveCallback: (coordinate: [number, number]) => void;
+  @Prop() broadcastGameUpdateCallback: (gameUpdate: any) => void;
 
   @State() isPlaying: boolean = false;
   @State() board: string[] = ['', '', '', '', '', '', '', '', ''];
   @State() currentPlayer: string;
 
   render() {
+    if (AppGameTicTacToe.game) {
+      AppGameTicTacToe.game.updateHandler = this.gameUpdateHandler;
+    }
+
     const height = 600;
     const width = 600;
+
+    if (!this.isHost && this.gameUpdate?.type === 'update') {
+      const update = this.gameUpdate.update as { gameBoard: string[][], nextPlayer: string, winner?: string };
+      this.gameUpdateHandler(
+        update.gameBoard,
+        update.nextPlayer,
+        update.winner
+      );
+    } else if (this.isHost && this.gameUpdate?.type === 'move') {
+      const update = this.gameUpdate.update as [number, number];
+      AppGameTicTacToe.game.play(update);
+    }
 
     return (
       <Host>
@@ -69,7 +91,11 @@ export class AppGameTicTacToe {
                   r={width / 6 * .8}
                   cursor='pointer'
                   onClick={() => {
-                    this.game.play([parseInt((index / 3).toString()), index % 3]);
+                    if (this.isHost) {
+                      AppGameTicTacToe.game.play([parseInt((index / 3).toString()), index % 3]);
+                    } else {
+                      this.notifyMoveCallback([parseInt((index / 3).toString()), index % 3]);
+                    }
                   }}
                 ></circle>
               ))
@@ -78,7 +104,7 @@ export class AppGameTicTacToe {
         </svg>
         <ion-button onClick={() => {
           this.isPlaying = true;
-          this.game = new TicTacToeGame(this.gameUpdateHandler);
+          AppGameTicTacToe.game = new TicTacToeGame(this.gameUpdateHandler);
         }}>Start/Restart</ion-button>
         <ion-text>{this.isPlaying ? `${this.currentPlayer}'s turn.` : 'Please start a game.'}</ion-text>
       </Host>
@@ -94,8 +120,16 @@ export class AppGameTicTacToe {
       this.isPlaying = false;
       this.currentPlayer = undefined;
     } else {
+      this.isPlaying = true;
       this.currentPlayer = nextPlayer;
     }
-  }
 
+    if (this.isHost) {
+      this.broadcastGameUpdateCallback({
+        gameBoard,
+        nextPlayer,
+        winner
+      });
+    }
+  }
 }
