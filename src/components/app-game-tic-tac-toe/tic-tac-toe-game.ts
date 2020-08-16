@@ -1,11 +1,11 @@
 export class TicTacToeGame {
     private gameBoard = [
-        ["", "", ""],
-        ["", "", ""],
-        ["", "", ""],
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', ''],
     ];
-    private currentPlayer: string = "o";
-    
+    private currentPlayer: string = 'o';
+
     updateHandler: (
         gameBoard: string[][],
         nextPlayer: string,
@@ -27,102 +27,94 @@ export class TicTacToeGame {
         const [x, y] = coordinate;
         if (!this.gameBoard[x][y]) {
             this.gameBoard[x][y] = this.currentPlayer;
-            const winner = this.determineWinner();
-            this.currentPlayer = this.currentPlayer == "o" ? "x" : "o";
+            let winner: string = undefined;
+            if (this.isWinning(x, y)) {
+                winner = this.currentPlayer;
+            } else if (this.isFull()) {
+                winner = 'tie'
+            }
+            this.currentPlayer = this.currentPlayer == 'o' ? 'x' : 'o';
             this.updateHandler(this.gameBoard, this.currentPlayer, winner);
         }
     }
 
-    determineWinner() {
-        let isGameEnd = false;
-        let winner = '';
-        for (let row = 0; row < 3; row++) {
-            isGameEnd = isGameEnd ||
-                this.determinePiecesFromSamePlayer(
-                    'o',
-                    [
-                        this.gameBoard[row][0],
-                        this.gameBoard[row][1],
-                        this.gameBoard[row][2]
-                    ]
-                ) ||
-                this.determinePiecesFromSamePlayer(
-                    'x',
-                    [
-                        this.gameBoard[row][0],
-                        this.gameBoard[row][1],
-                        this.gameBoard[row][2]
-                    ]
-                );
-        }
-        for (let column = 0; column < 3; column++) {
-            isGameEnd = isGameEnd ||
-                this.determinePiecesFromSamePlayer(
-                    'o',
-                    [
-                        this.gameBoard[0][column],
-                        this.gameBoard[1][column],
-                        this.gameBoard[2][column]
-                    ]
-                ) ||
-                this.determinePiecesFromSamePlayer(
-                    'x',
-                    [
-                        this.gameBoard[0][column],
-                        this.gameBoard[1][column],
-                        this.gameBoard[2][column]
-                    ]
-                );
-        }
-        isGameEnd = isGameEnd ||
-            this.determinePiecesFromSamePlayer(
-                'o',
-                [
-                    this.gameBoard[0][0],
-                    this.gameBoard[1][1],
-                    this.gameBoard[2][2]
-                ]
-            ) ||
-            this.determinePiecesFromSamePlayer(
-                'x',
-                [
-                    this.gameBoard[0][0],
-                    this.gameBoard[1][1],
-                    this.gameBoard[2][2]
-                ]
-            );
-        isGameEnd = isGameEnd ||
-            this.determinePiecesFromSamePlayer(
-                'o',
-                [
-                    this.gameBoard[0][2],
-                    this.gameBoard[1][1],
-                    this.gameBoard[2][0]
-                ]
-            ) ||
-            this.determinePiecesFromSamePlayer(
-                'x',
-                [
-                    this.gameBoard[0][2],
-                    this.gameBoard[1][1],
-                    this.gameBoard[2][0]
-                ]
-            );
-        if (isGameEnd) {
-            winner = this.currentPlayer;
-        }
-        if (this.gameBoard.flatMap(d => d).every(Boolean)) {
-            winner = 'tie';
-        }
-        return winner;
+    isWinning(x: number, y: number): boolean {
+        return this.checkHorizontal(x, y) ||
+            this.checkVertical(x, y) ||
+            this.checkLeftDiagonal(x, y) ||
+            this.checkRightDiagonal(x, y);
     }
 
-    determinePiecesFromSamePlayer(player: string, pieces: string[]) {
-        for (const piece of pieces) {
-            if (piece !== player) {
+    isFull(): boolean {
+        return this.gameBoard.flatMap(d => d).every(Boolean)
+    }
+
+    checkVertical(x: number, y: number): boolean {
+        let occupy = this.gameBoard[x][y];
+        for (let i = 0; i < this.gameBoard.length; i++) {
+            if (this.gameBoard[i][y] != occupy) {
                 return false;
             }
         }
         return true;
     }
+
+    checkHorizontal(x: number, y: number): boolean {
+        let occupy = this.gameBoard[x][y];
+        for (let j = 0; j < this.gameBoard[0].length; j++) {
+            if (this.gameBoard[x][j] != occupy) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    checkLeftDiagonal(x: number, y: number): boolean {
+        let criteria = 2, count = 0;
+        let occupy = this.gameBoard[x][y];
+        for (
+            let i = x - 1, j = y - 1;
+            i >= 0 && j >= 0;
+            i--, j--
+        ) {
+            if (this.gameBoard[i][j] === occupy) {
+                count++;
+            }
+        }
+        for (
+            let i = x + 1, j = y + 1;
+            i < this.gameBoard.length && j < this.gameBoard[0].length;
+            i++, j++
+        ) {
+            if (this.gameBoard[i][j] === occupy) {
+                count++;
+            }
+        }
+        return count >= criteria;
+    }
+
+    checkRightDiagonal(x: number, y: number): boolean {
+        let criteria = 2, count = 0;
+        let occupy = this.gameBoard[x][y];
+        for (
+            let i = x - 1, j = y + 1;
+            i >= 0 && j < this.gameBoard[0].length;
+            i--, j++
+        ) {
+            if (this.gameBoard[i][j] === occupy) {
+                count++;
+            }
+        }
+        for (
+            let i = x + 1,
+            j = y - 1; i < this.gameBoard.length && j >= 0;
+            i++, j--
+        ) {
+            if (this.gameBoard[i][j] === occupy) {
+                count++;
+            }
+        }
+        return count >= criteria;
+    }
+
 }
